@@ -1,0 +1,11 @@
+{
+  "name": "@dep-trust/types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./scan": "./src/scan.ts",
+    "./workspace": "./src/workspace.ts",
+    "./github": "./src/github.ts"
+  }
+}
