@@ -18,6 +18,12 @@ export function Footer() {
           >
             npm
           </a>
+          <a
+            href="https://dep-trust.vercel.app"
+            className="font-mono text-[11px] uppercase tracking-[0.06em] text-text-secondary hover:text-text-primary transition-colors duration-200"
+          >
+            Dashboard
+          </a>
         </div>
       </div>
     </footer>

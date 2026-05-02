@@ -25,6 +25,12 @@ export default function Home() {
               </p>
               <div className="mt-10 flex items-center gap-6">
                 <a
+                  href="https://dep-trust.vercel.app/signup"
+                  className="inline-flex font-mono text-[13px] uppercase tracking-[0.06em] px-8 py-3 bg-text-display text-black rounded-full hover:opacity-90 transition-opacity duration-200"
+                >
+                  Get Started
+                </a>
+                <a
                   href="https://github.com/salarkhannn/dep-trust"
                   className="inline-flex font-mono text-[13px] uppercase tracking-[0.06em] px-6 py-2.5 border border-border-visible text-text-primary rounded-full hover:text-text-display hover:border-text-display transition-colors duration-200"
                 >
