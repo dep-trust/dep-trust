@@ -127,10 +127,12 @@ function buildComment(scanId: string, result: {
     }
   }
 
-  lines.push(
-    '',
-    `[View full scan](${process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://dep-trust-dashboard.vercel.app'}/scans/${scanId})`,
-  )
+  const dashboardUrl =
+    process.env['NEXT_PUBLIC_APP_URL'] ??
+    process.env['NEXT_PUBLIC_DASHBOARD_URL'] ??
+    'https://dep-trust-dashboard.vercel.app'
+
+  lines.push('', `[View full scan](${dashboardUrl}/scans/${scanId})`)
   return lines.join('\n')
 }
 

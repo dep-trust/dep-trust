@@ -25,7 +25,7 @@ export default function Home() {
               </p>
               <div className="mt-10 flex items-center gap-6">
                 <a
-                  href="https://dep-trust-dashboard.vercel.app/signup"
+                  href={`${process.env['NEXT_PUBLIC_DASHBOARD_URL'] ?? 'https://dep-trust-dashboard.vercel.app'}/signup`}
                   className="inline-flex font-mono text-[13px] uppercase tracking-[0.06em] px-8 py-3 bg-text-display text-black rounded-full hover:opacity-90 transition-opacity duration-200"
                 >
                   Get Started

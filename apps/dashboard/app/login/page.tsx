@@ -13,7 +13,12 @@ export default function LoginPage() {
   return (
     <div className="auth-wrap">
       <div className="auth-card">
-        <Link href="/" className="auth-wordmark">dep-trust</Link>
+        <a
+          href={process.env['NEXT_PUBLIC_MARKETING_URL'] ?? 'https://dep-trust.vercel.app'}
+          className="auth-wordmark"
+        >
+          dep-trust
+        </a>
         <h1 className="auth-title">Sign in</h1>
 
         {state?.error && <p className="error-msg">{state.error}</p>}
