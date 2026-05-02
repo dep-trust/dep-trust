@@ -129,7 +129,7 @@ function buildComment(scanId: string, result: {
 
   lines.push(
     '',
-    `[View full scan](${process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://dep-trust.vercel.app/app'}/scans/${scanId})`,
+    `[View full scan](${process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://dep-trust-dashboard.vercel.app'}/scans/${scanId})`,
   )
   return lines.join('\n')
 }

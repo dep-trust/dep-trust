@@ -4,13 +4,12 @@ import { createSupabaseServerClient, createSupabaseAdminClient } from '@/lib/sup
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
-  const basePath = '/app'
   const { searchParams } = req.nextUrl
   const installationId = searchParams.get('installation_id')
   const setupAction = searchParams.get('setup_action')
 
   if (!installationId) {
-    return NextResponse.redirect(new URL(`${basePath}/github`, req.url))
+    return NextResponse.redirect(new URL('/github', req.url))
   }
 
   const supabase = await createSupabaseServerClient()
@@ -19,7 +18,7 @@ export async function GET(req: NextRequest) {
   } = await supabase.auth.getUser()
 
   if (!user) {
-    return NextResponse.redirect(new URL(`${basePath}/login`, req.url))
+    return NextResponse.redirect(new URL('/login', req.url))
   }
 
   const { data: member } = await supabase
@@ -31,7 +30,7 @@ export async function GET(req: NextRequest) {
     .single()
 
   if (!member) {
-    return NextResponse.redirect(new URL(`${basePath}/github`, req.url))
+    return NextResponse.redirect(new URL('/github', req.url))
   }
 
   const clientId = process.env['GITHUB_APP_CLIENT_ID']!
@@ -84,5 +83,5 @@ export async function GET(req: NextRequest) {
     { onConflict: 'installation_id' },
   )
 
-  return NextResponse.redirect(new URL(`${basePath}/github`, req.url))
+  return NextResponse.redirect(new URL('/github', req.url))
 }
