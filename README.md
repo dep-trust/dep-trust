@@ -1,84 +1,81 @@
 # dep-trust
 
-A developer security tool that protects Node.js projects from npm supply chain attacks. It flags recently updated dependencies, detects suspicious install scripts, and diffs the current lockfile against a known-good snapshot.
+npm supply chain attack detection — CLI, cloud dashboard, and GitHub App.
 
-## Monorepo structure
+## Packages
 
-```
-dep-trust/
-├── packages/
-│   └── cli/           # The npm package (dep-trust)
-├── apps/
-│   └── web/           # Marketing site (Next.js)
-├── pnpm-workspace.yaml
-├── package.json
-└── tsconfig.base.json
-```
+| Package | Description |
+|---|---|
+| `packages/cli` | Published CLI (`dep-trust`) — offline scanning, auth, cloud sync |
+| `packages/types` | Shared TypeScript types (`@dep-trust/types`) — workspace only |
+| `apps/web` | Marketing site (`dep-trust.dev`) |
+| `apps/dashboard` | Cloud dashboard + REST API (`app.dep-trust.dev`) |
 
-## Prerequisites
-
-- Node.js 18+
-- pnpm 9+
-
-## Setup
+## Getting started
 
 ```sh
 pnpm install
 ```
 
-## CLI development
-
-```sh
-# Build the CLI
-cd packages/cli
-pnpm build
-
-# Run directly (without building)
-npx tsx src/cli.ts scan
-
-# Run tests
-pnpm test
-```
-
-### CLI usage
-
-```sh
-dep-trust scan                  # Run full audit
-dep-trust scan --age 24         # Override freshness window to 24h
-dep-trust scan --no-scripts     # Skip install script detection
-dep-trust scan --json           # Output machine-readable JSON
-dep-trust snapshot              # Save current lockfile as baseline
-dep-trust allow <package>       # Add a package to the allowlist
-dep-trust allow --list          # Print the current allowlist
-```
-
-## Marketing site
-
-```sh
-cd apps/web
-pnpm dev       # Start dev server on localhost:3000
-pnpm build     # Production build
-```
-
-## Testing
-
-```sh
-# Run CLI tests
-cd packages/cli
-pnpm test
-
-# Or from root
-pnpm -r test
-```
-
-## Publishing
+### CLI
 
 ```sh
 cd packages/cli
 pnpm build
-npm publish
+
+dep-trust scan                 # offline scan
+dep-trust auth login           # authenticate with cloud
+dep-trust auth login --token   # store a token directly
+dep-trust auth status
+dep-trust allow <package>      # add to allowlist (syncs if authenticated)
+dep-trust snapshot             # save lockfile baseline
 ```
 
-## License
+### Dashboard
 
-MIT
+```sh
+cp .env.example apps/dashboard/.env.local
+# fill in the values
+
+pnpm --filter dashboard dev    # http://localhost:3001
+```
+
+## Environment variables
+
+Copy `.env.example` to `apps/dashboard/.env.local` and fill in each value.
+
+| Variable | Where to get it |
+|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Project Settings → API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Project Settings → API |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Project Settings → API |
+| `GITHUB_APP_ID` | GitHub → App Settings → General |
+| `GITHUB_APP_PRIVATE_KEY` | GitHub → App Settings → Private keys (PEM, `\n` escaped) |
+| `GITHUB_APP_WEBHOOK_SECRET` | Set when creating the GitHub App |
+| `GITHUB_APP_CLIENT_ID` | GitHub → App Settings → General |
+| `GITHUB_APP_CLIENT_SECRET` | GitHub → App Settings → Client secrets |
+| `NEXT_PUBLIC_APP_URL` | Your deployed dashboard URL |
+
+## Database
+
+Apply `supabase/schema.sql` to your Supabase project via the SQL editor:
+
+```
+https://supabase.com/dashboard/project/<project-id>/sql/new
+```
+
+## GitHub App
+
+1. Create the app at https://github.com/settings/apps/new
+2. Set the webhook URL to `https://app.dep-trust.dev/api/github/webhook`
+3. Set the callback URL to `https://app.dep-trust.dev/api/github/callback`
+4. Request permissions: **Pull requests** (read & write), **Contents** (read)
+5. Subscribe to events: **Pull request**
+6. Copy App ID, Client ID, Client Secret, Webhook Secret into `.env.local`
+7. Generate and download a private key; store the PEM content as `GITHUB_APP_PRIVATE_KEY` with literal `\n` for newlines
+
+## Deployment
+
+Deploy `apps/dashboard` to Vercel. Set all environment variables in the Vercel project settings.
+
+The `apps/web` marketing site deploys independently.
