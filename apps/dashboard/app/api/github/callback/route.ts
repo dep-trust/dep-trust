@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { createSupabaseServerClient, createSupabaseAdminClient } from '../../../../lib/supabase/server'
+import { createSupabaseServerClient, createSupabaseAdminClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(new URL('/github', req.url))
   }
 
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()

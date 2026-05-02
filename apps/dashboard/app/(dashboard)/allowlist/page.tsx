@@ -1,9 +1,9 @@
-import { createSupabaseServerClient } from '../../../lib/supabase/server'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { AllowlistEntry } from '@dep-trust/types/workspace'
 import { AllowlistClient } from './allowlist-client'
 
 export default async function AllowlistPage() {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
 
   const { data: member } = await supabase
     .from('workspace_members')

@@ -1,4 +1,4 @@
-import { TokenDisplay } from '../../../components/token-display'
+import { TokenDisplay } from '@/components/token-display'
 
 async function generateToken(): Promise<{ token?: string; error?: string }> {
   'use server'
@@ -6,7 +6,7 @@ async function generateToken(): Promise<{ token?: string; error?: string }> {
   const { createHash, randomBytes } = await import('node:crypto')
   const { createSupabaseServerClient } = await import('../../../lib/supabase/server')
 
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) return { error: 'Not authenticated' }

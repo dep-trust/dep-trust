@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { logoutAction } from '../app/actions'
+import { logoutAction } from '@/app/actions'
 
 const NAV_ITEMS = [
   { href: '/scans', label: 'Scans' },

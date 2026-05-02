@@ -1,8 +1,8 @@
-import { createSupabaseServerClient } from '../../../lib/supabase/server'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { SettingsClient } from './settings-client'
 
 export default async function SettingsPage() {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
 
   const { data: member } = await supabase
     .from('workspace_members')

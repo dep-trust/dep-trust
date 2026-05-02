@@ -94,7 +94,7 @@ async function main(): Promise<void> {
   switch (cli.command) {
     case 'scan': {
       const startedAt = Date.now()
-      const token = await getToken()
+      const token = cli.token ?? await getToken()
       const allowlist = await loadAllowlistWithRemote(cwd, token)
 
       let spinner: ReturnType<typeof setInterval> | undefined

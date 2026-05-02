@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'node:crypto'
 import { type NextRequest } from 'next/server'
-import { authenticate, apiErrorResponse } from '../../../../lib/auth'
-import { createSupabaseAdminClient } from '../../../../lib/supabase/server'
+import { authenticate, apiErrorResponse } from '@/lib/auth'
+import { createSupabaseAdminClient } from '@/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
   try {

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
-import { createSupabaseServerClient } from '../../../../lib/supabase/server'
-import { FindingsSection } from '../../../../components/findings-section'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
+import { FindingsSection } from '@/components/findings-section'
 import type { ScanRecord } from '@dep-trust/types/scan'
 
 function formatDate(iso: string) {
@@ -22,13 +22,14 @@ function formatAge(hours: number | null): string {
   return `${Math.floor(hours / 24)}d`
 }
 
-export default async function ScanDetailPage({ params }: { params: { id: string } }) {
-  const supabase = createSupabaseServerClient()
+export default async function ScanDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const supabase = await createSupabaseServerClient()
 
   const { data: scan, error } = await supabase
     .from('scans')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (error || !scan) notFound()

@@ -67,8 +67,8 @@ https://supabase.com/dashboard/project/<project-id>/sql/new
 ## GitHub App
 
 1. Create the app at https://github.com/settings/apps/new
-2. Set the webhook URL to `https://app.dep-trust.dev/api/github/webhook`
-3. Set the callback URL to `https://app.dep-trust.dev/api/github/callback`
+2. Set the webhook URL to `https://dep-trust.vercel.app/api/github/webhook`
+3. Set the callback URL to `https://dep-trust.vercel.app/api/github/callback`
 4. Request permissions: **Pull requests** (read & write), **Contents** (read)
 5. Subscribe to events: **Pull request**
 6. Copy App ID, Client ID, Client Secret, Webhook Secret into `.env.local`

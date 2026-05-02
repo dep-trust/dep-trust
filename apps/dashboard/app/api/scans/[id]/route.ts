@@ -1,9 +1,10 @@
 import { type NextRequest } from 'next/server'
-import { authenticate, apiErrorResponse } from '../../../../../lib/auth'
-import { createSupabaseAdminClient } from '../../../../../lib/supabase/server'
-import { ApiError } from '../../../../../lib/auth'
+import { authenticate, apiErrorResponse } from '@/lib/auth'
+import { createSupabaseAdminClient } from '@/lib/supabase/server'
+import { ApiError } from '@/lib/auth'
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     const ctx = await authenticate(req)
     const admin = createSupabaseAdminClient()
@@ -11,7 +12,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     const { data, error } = await admin
       .from('scans')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('workspace_id', ctx.workspaceId)
       .single()
 

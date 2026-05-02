@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import pc from 'picocolors'
 import type { ScanFindings, ScanRecord, ScanResult, ScanSummary } from '@dep-trust/types/scan'
 
-const API_BASE = process.env['DEP_TRUST_API_URL'] ?? 'https://app.dep-trust.dev'
+const API_BASE = process.env['DEP_TRUST_API_URL'] ?? 'https://dep-trust.vercel.app'
 
 export async function syncScan(
   token: string,

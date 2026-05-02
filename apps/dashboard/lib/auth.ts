@@ -52,7 +52,7 @@ async function authenticateCliToken(rawToken: string): Promise<AuthContext> {
 }
 
 async function authenticateSession(): Promise<AuthContext> {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
 
   const {
     data: { user },

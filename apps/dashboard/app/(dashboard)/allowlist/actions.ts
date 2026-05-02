@@ -1,13 +1,13 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createSupabaseServerClient } from '../../../lib/supabase/server'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export async function addAllowlistEntry(formData: FormData): Promise<{ error?: string }> {
   const packageName = (formData.get('package_name') as string)?.trim()
   if (!packageName) return { error: 'Package name is required' }
 
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
 
   const { data: user } = await supabase.auth.getUser()
   if (!user.user) return { error: 'Not authenticated' }
@@ -35,7 +35,7 @@ export async function addAllowlistEntry(formData: FormData): Promise<{ error?: s
 }
 
 export async function removeAllowlistEntry(packageName: string): Promise<{ error?: string }> {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
 
   const { data: user } = await supabase.auth.getUser()
   if (!user.user) return { error: 'Not authenticated' }

@@ -2,7 +2,7 @@ import * as readline from 'node:readline'
 import pc from 'picocolors'
 import { deleteToken, getToken, setToken } from './token-store'
 
-const CLI_AUTH_URL = 'https://app.dep-trust.dev/cli-auth'
+const CLI_AUTH_URL = 'https://dep-trust.vercel.app/cli-auth'
 
 export async function loginCommand(opts: { token?: string }): Promise<void> {
   if (opts.token) {

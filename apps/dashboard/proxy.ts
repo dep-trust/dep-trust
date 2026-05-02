@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server'
 
 const PUBLIC_PATHS = ['/login', '/signup', '/api/']
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   let res = NextResponse.next({ request: req })
 
   const supabase = createServerClient(
@@ -14,7 +14,7 @@ export async function middleware(req: NextRequest) {
         getAll() {
           return req.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: any[]) {
           for (const { name, value } of cookiesToSet) {
             req.cookies.set(name, value)
           }

@@ -1,11 +1,12 @@
 import { type NextRequest } from 'next/server'
-import { authenticate, apiErrorResponse } from '../../../../../lib/auth'
-import { createSupabaseAdminClient } from '../../../../../lib/supabase/server'
+import { authenticate, apiErrorResponse } from '@/lib/auth'
+import { createSupabaseAdminClient } from '@/lib/supabase/server'
 
-export async function DELETE(req: NextRequest, { params }: { params: { package: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ package: string }> }) {
+  const { package: pkgName } = await params;
   try {
     const ctx = await authenticate(req)
-    const packageName = decodeURIComponent(params.package)
+    const packageName = decodeURIComponent(pkgName)
     const admin = createSupabaseAdminClient()
 
     const { error } = await admin

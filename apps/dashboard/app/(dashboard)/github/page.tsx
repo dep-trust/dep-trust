@@ -1,10 +1,10 @@
-import { createSupabaseServerClient } from '../../../lib/supabase/server'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { GitHubInstallation } from '@dep-trust/types/github'
 
 const GITHUB_APP_INSTALL_URL = 'https://github.com/apps/dep-trust/installations/new'
 
 export default async function GitHubPage() {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
 
   const { data: member } = await supabase
     .from('workspace_members')

@@ -3,7 +3,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { type NextRequest } from 'next/server'
-import { createSupabaseAdminClient } from '../../../../lib/supabase/server'
+import { createSupabaseAdminClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
@@ -127,7 +127,7 @@ function buildComment(scanId: string, result: {
     }
   }
 
-  lines.push('', `[View full scan](${process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://app.dep-trust.dev'}/scans/${scanId})`)
+  lines.push('', `[View full scan](${process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://dep-trust.vercel.app'}/scans/${scanId})`)
   return lines.join('\n')
 }
 

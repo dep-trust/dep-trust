@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { createSupabaseServerClient } from '../../../lib/supabase/server'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 import type { ScanRecord } from '@dep-trust/types/scan'
 
 function formatDate(iso: string) {
@@ -13,7 +13,7 @@ function formatDate(iso: string) {
 }
 
 export default async function ScansPage() {
-  const supabase = createSupabaseServerClient()
+  const supabase = await createSupabaseServerClient()
 
   const { data: member } = await supabase
     .from('workspace_members')

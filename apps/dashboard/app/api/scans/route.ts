@@ -1,7 +1,7 @@
 import { type NextRequest } from 'next/server'
-import { authenticate, apiErrorResponse } from '../../../../lib/auth'
-import { ValidationError, validate } from '../../../../lib/validate'
-import { createSupabaseAdminClient } from '../../../../lib/supabase/server'
+import { authenticate, apiErrorResponse } from '@/lib/auth'
+import { ValidationError, validate } from '@/lib/validate'
+import { createSupabaseAdminClient } from '@/lib/supabase/server'
 import type { ScanFindings, ScanSummary } from '@dep-trust/types/scan'
 
 export async function GET(req: NextRequest) {

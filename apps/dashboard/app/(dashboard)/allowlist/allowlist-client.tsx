@@ -59,7 +59,7 @@ export function AllowlistClient({ entries }: { entries: AllowlistEntry[] }) {
                     {formatDate(entry.created_at)}
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <form action={removeAllowlistEntry.bind(null, entry.package_name)}>
+                    <form action={async () => { await removeAllowlistEntry(entry.package_name) }}>
                       <button type="submit" className="btn btn--ghost" style={{ fontSize: 12, padding: '4px 10px' }}>
                         Remove
                       </button>
