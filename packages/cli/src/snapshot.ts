@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { parseLockfile } from './lockfile'
-import type { LockfileDependency, SnapshotDiff } from './types'
+import type { LockfileDependency, SnapshotDiff } from '@dep-trust/types/scan'
 
 interface Snapshot {
   date: string

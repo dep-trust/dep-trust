@@ -8,6 +8,7 @@ export default defineConfig([
     dts: false,
     clean: true,
     banner: { js: '#!/usr/bin/env node' },
+    external: ['keytar'],
   },
   {
     entry: { scan: 'src/scan.ts' },
@@ -15,5 +16,6 @@ export default defineConfig([
     target: 'node18',
     dts: true,
     clean: false,
+    external: ['keytar'],
   },
 ])

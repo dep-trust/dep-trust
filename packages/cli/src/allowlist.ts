@@ -16,10 +16,35 @@ export function loadAllowlist(cwd: string): Set<string> {
   }
 }
 
-export function addToAllowlist(cwd: string, name: string): void {
+export async function loadAllowlistWithRemote(
+  cwd: string,
+  token: string | null,
+): Promise<Set<string>> {
+  const local = loadAllowlist(cwd)
+  if (!token) return local
+
+  const { fetchRemoteAllowlist } = await import('./sync/client')
+  const remote = await fetchRemoteAllowlist(token)
+
+  for (const pkg of remote) {
+    local.add(pkg)
+  }
+  return local
+}
+
+export async function addToAllowlist(
+  cwd: string,
+  name: string,
+  token: string | null,
+): Promise<void> {
   const allowlist = loadAllowlist(cwd)
   allowlist.add(name)
   writeAllowlist(cwd, allowlist)
+
+  if (token) {
+    const { syncAllowlistAdd } = await import('./sync/client')
+    await syncAllowlistAdd(token, name)
+  }
 }
 
 export function listAllowlist(cwd: string): string[] {

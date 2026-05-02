@@ -2,7 +2,7 @@ import { checkFreshness } from './freshness'
 import { parseLockfile } from './lockfile'
 import { detectScripts } from './scripts'
 import { diffSnapshot, saveSeen } from './snapshot'
-import type { ScanOptions, ScanResult } from './types'
+import type { ScanOptions, ScanResult } from '@dep-trust/types/scan'
 
 const DEFAULT_OPTIONS: ScanOptions = {
   age: 72,
@@ -11,14 +11,17 @@ const DEFAULT_OPTIONS: ScanOptions = {
   cwd: process.cwd(),
 }
 
-export async function scan(options?: Partial<ScanOptions>): Promise<ScanResult> {
+export async function scan(
+  options?: Partial<ScanOptions> & { allowlist?: Set<string> },
+): Promise<ScanResult> {
   const opts = { ...DEFAULT_OPTIONS, ...options }
   const deps = parseLockfile(opts.cwd)
   const packages = deps.map((dep) => ({ name: dep.name, version: dep.version }))
+  const allowlist = options?.allowlist ?? new Set<string>()
 
   const [freshness, scripts, diff] = await Promise.all([
     checkFreshness(packages, opts.age),
-    Promise.resolve(opts.scripts ? detectScripts(opts.cwd) : []),
+    Promise.resolve(opts.scripts ? detectScripts(opts.cwd, allowlist) : []),
     Promise.resolve(diffSnapshot(opts.cwd)),
   ])
 

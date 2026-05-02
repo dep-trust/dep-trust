@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import type { LockfileDependency } from './types'
+import type { LockfileDependency } from '@dep-trust/types/scan'
 
 export function parseLockfile(cwd: string): LockfileDependency[] {
   const npmLock = tryReadFile(join(cwd, 'package-lock.json'))

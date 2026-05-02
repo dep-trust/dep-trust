@@ -1,5 +1,5 @@
 import pc from 'picocolors'
-import type { FreshnessResult, ScanResult, ScriptResult, SnapshotDiff } from './types'
+import type { FreshnessResult, ScanResult, ScriptResult, SnapshotDiff } from '@dep-trust/types/scan'
 
 export function formatScanResult(result: ScanResult): string {
   const lines: string[] = []

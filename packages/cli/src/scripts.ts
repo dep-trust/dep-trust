@@ -1,13 +1,11 @@
 import { readFileSync, readdirSync } from 'node:fs'
 import { join } from 'node:path'
-import { loadAllowlist } from './allowlist'
-import type { ScriptResult } from './types'
+import type { ScriptResult } from '@dep-trust/types/scan'
 
 const INSTALL_HOOKS = ['preinstall', 'install', 'postinstall'] as const
 
-export function detectScripts(cwd: string): ScriptResult[] {
+export function detectScripts(cwd: string, allowlist: Set<string>): ScriptResult[] {
   const nodeModules = join(cwd, 'node_modules')
-  const allowlist = loadAllowlist(cwd)
   const seenPath = join(cwd, '.dep-trust', 'seen-scripts.json')
   const seen = loadSeen(seenPath)
   const results: ScriptResult[] = []

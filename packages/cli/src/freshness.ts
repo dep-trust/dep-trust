@@ -1,6 +1,6 @@
 import { pMap } from './concurrency'
 import { fetchPackageInfo } from './registry'
-import type { FreshnessResult, PackageMeta } from './types'
+import type { FreshnessResult, PackageMeta } from '@dep-trust/types/scan'
 
 const REGISTRY_CONCURRENCY = 10
 
