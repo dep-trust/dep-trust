@@ -1,7 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
 
-const PUBLIC_PATHS = ['/login', '/signup', '/api/']
+const APP_BASE_PATH = '/app'
+const PUBLIC_PATHS = [`${APP_BASE_PATH}/login`, `${APP_BASE_PATH}/signup`, `${APP_BASE_PATH}/api/`]
 
 export async function proxy(req: NextRequest) {
   let res = NextResponse.next({ request: req })
@@ -32,15 +33,15 @@ export async function proxy(req: NextRequest) {
   } = await supabase.auth.getUser()
 
   const isPublic = PUBLIC_PATHS.some((p) => req.nextUrl.pathname.startsWith(p))
-  const isRoot = req.nextUrl.pathname === '/'
+  const isRoot = req.nextUrl.pathname === APP_BASE_PATH || req.nextUrl.pathname === `${APP_BASE_PATH}/`
 
   if (!user && !isPublic && !isRoot) {
-    return NextResponse.redirect(new URL('/login', req.url))
+    return NextResponse.redirect(new URL(`${APP_BASE_PATH}/login`, req.url))
   }
 
   return res
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: [`${APP_BASE_PATH}/((?!_next/static|_next/image|favicon.ico).*)`],
 }

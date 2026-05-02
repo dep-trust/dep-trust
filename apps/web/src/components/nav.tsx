@@ -25,13 +25,13 @@ export function Nav() {
             GitHub
           </a>
           <a
-            href="https://dep-trust.vercel.app/login"
+            href="/app/login"
             className="font-mono text-[11px] uppercase tracking-[0.06em] text-text-secondary hover:text-text-primary transition-colors duration-200"
           >
             Login
           </a>
           <a
-            href="https://dep-trust.vercel.app/signup"
+            href="/app/signup"
             className="font-mono text-[13px] uppercase tracking-[0.06em] px-6 py-2 border border-border-visible text-text-primary rounded-full hover:text-text-display hover:border-text-display transition-colors duration-200"
           >
             Sign up
