@@ -8,12 +8,12 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <Nav />
 
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         {/* Hero — Primary layer: Doto display, one strong statement */}
-        <section className="px-6 pt-32 pb-24 max-w-6xl mx-auto">
+        <section className="px-6 pt-32 pb-24 max-w-6xl mx-auto clip-reveal">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-            <div>
-              <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-text-secondary mb-6">
+            <div className="animate-stagger-1">
+              <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-accent mb-6">
                 npm supply chain protection
               </p>
               <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] text-text-display">
@@ -22,31 +22,34 @@ export default function Home() {
               <p className="mt-8 text-lg text-text-secondary max-w-xl leading-relaxed">
                 dep-trust scans your npm dependency tree for supply chain attack indicators — freshly published packages, 
                 typosquatting, obfuscated code payloads, malicious install scripts, and missing SLSA provenance.
+                <br /><br />
+                <span className="text-text-primary font-medium tracking-wide text-sm bg-accent-subtle text-accent px-2 py-1 rounded">100% Free forever. No credit card.</span>
               </p>
-              <div className="mt-10 flex items-center gap-6">
+              <div className="mt-10 flex items-center gap-6 animate-stagger-2">
                 <a
                   href={`${process.env['NEXT_PUBLIC_DASHBOARD_URL'] ?? 'https://dep-trust-dashboard.vercel.app'}/signup`}
-                  className="inline-flex font-mono text-[13px] uppercase tracking-[0.06em] px-8 py-3 bg-text-display text-black rounded-full hover:opacity-90 transition-opacity duration-200"
+                  className="hover-scale inline-flex font-mono text-[13px] uppercase tracking-[0.06em] px-8 py-3 bg-text-display text-black rounded-full hover:opacity-90"
                 >
-                  Get Started
+                  Start Using Free
                 </a>
                 <a
                   href="https://github.com/salarkhannn/dep-trust"
-                  className="inline-flex font-mono text-[13px] uppercase tracking-[0.06em] px-6 py-2.5 border border-border-visible text-text-primary rounded-full hover:text-text-display hover:border-text-display transition-colors duration-200"
+                  className="hover-scale inline-flex font-mono text-[13px] uppercase tracking-[0.06em] px-6 py-2.5 border border-border-visible text-text-primary rounded-full hover:text-text-display hover:border-text-display"
                 >
                   View on GitHub
                 </a>
               </div>
             </div>
-            <div className="mt-16 lg:mt-0 w-full">
+            <div className="mt-16 lg:mt-0 w-full animate-stagger-3">
               <Terminal />
             </div>
           </div>
         </section>
 
         {/* Problem — Secondary layer: Space Grotesk body text */}
-        <section className="px-6 py-24 border-t border-border">
-          <div className="max-w-3xl mx-auto">
+        <section className="px-6 py-32 border-t border-border animate-stagger-4 relative overflow-hidden">
+          <div className="absolute top-0 right-1/4 w-[50vw] h-[50vw] bg-accent opacity-5 rounded-full blur-[100px] pointer-events-none" />
+          <div className="max-w-3xl mx-auto relative z-10">
             <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-text-secondary mb-4">
               The problem
             </p>
@@ -70,8 +73,9 @@ export default function Home() {
         </section>
 
         {/* How it works — Three numbered steps, Space Mono numbers as accent */}
-        <section className="px-6 py-24 border-t border-border">
-          <div className="max-w-3xl mx-auto">
+        <section className="px-6 py-32 border-t border-border relative overflow-hidden">
+          <div className="absolute top-1/2 left-0 w-[40vw] h-[40vw] bg-interactive opacity-5 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
+          <div className="max-w-3xl mx-auto relative z-10">
             <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-text-secondary mb-4">
               How it works
             </p>
@@ -152,8 +156,9 @@ export default function Home() {
         </section>
 
         {/* Install — Code blocks with copy */}
-        <section className="px-6 py-24 border-t border-border">
-          <div className="max-w-3xl mx-auto">
+        <section className="px-6 py-32 border-t border-border relative overflow-hidden">
+          <div className="absolute bottom-0 right-0 w-[60vw] h-[30vw] bg-success opacity-5 rounded-full blur-[150px] pointer-events-none" />
+          <div className="max-w-3xl mx-auto relative z-10">
             <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-text-secondary mb-4">
               Get started
             </p>
