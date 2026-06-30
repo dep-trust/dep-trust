@@ -13,6 +13,9 @@ import {
   hashLockfile,
   syncScan,
 } from './sync/client'
+import { generateSbom } from './sbom'
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 interface CliArgs {
   command: string
@@ -25,23 +28,39 @@ interface CliArgs {
   list: boolean
   ci: boolean
   deep: boolean
+  sbom: boolean
   failOn: import('@dep-trust/types/scan').FailOn
 }
 
-function parseArgs(argv: string[]): CliArgs {
+function loadConfig(cwd: string): Partial<CliArgs> {
+  try {
+    const configPath = join(cwd, '.dep-trust.json')
+    if (existsSync(configPath)) {
+      return JSON.parse(readFileSync(configPath, 'utf-8'))
+    }
+  } catch {
+    // ignore
+  }
+  return {}
+}
+
+function parseArgs(argv: string[], cwd: string): CliArgs {
   const args = argv.slice(2)
+  const config = loadConfig(cwd)
+  
   const parsed: CliArgs = {
     command: args[0] ?? 'scan',
     subcommand: args[1] && !args[1].startsWith('--') ? args[1] : null,
-    age: 72,
-    scripts: true,
+    age: config.age ?? 72,
+    scripts: config.scripts ?? true,
     json: false,
     packageName: null,
     token: null,
     list: false,
-    ci: false,
-    deep: false,
-    failOn: 'all',
+    ci: config.ci ?? false,
+    deep: config.deep ?? false,
+    sbom: false,
+    failOn: config.failOn ?? 'all',
   }
 
   for (let i = 1; i < args.length; i++) {
@@ -57,6 +76,9 @@ function parseArgs(argv: string[]): CliArgs {
         break
       case '--json':
         parsed.json = true
+        break
+      case '--sbom':
+        parsed.sbom = true
         break
       case '--list':
         parsed.list = true
@@ -96,6 +118,7 @@ Usage:
   dep-trust scan --age 24         Override freshness window (hours)
   dep-trust scan --no-scripts     Skip install script detection
   dep-trust scan --json           Output machine-readable JSON
+  dep-trust scan --sbom           Output CycloneDX SBOM
   dep-trust snapshot              Save current lockfile as baseline
   dep-trust allow <package>       Add a package to the allowlist
   dep-trust allow --list          Print the current allowlist
@@ -107,8 +130,8 @@ Usage:
 }
 
 async function main(): Promise<void> {
-  const cli = parseArgs(process.argv)
   const cwd = process.cwd()
+  const cli = parseArgs(process.argv, cwd)
 
   switch (cli.command) {
     case 'scan': {
@@ -117,7 +140,7 @@ async function main(): Promise<void> {
       const allowlist = await loadAllowlistWithRemote(cwd, token)
 
       let spinner: ReturnType<typeof setInterval> | undefined
-      if (!cli.json) {
+      if (!cli.json && !cli.sbom) {
         const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
         let i = 0
         process.stdout.write('\x1B[?25l')
@@ -130,13 +153,7 @@ async function main(): Promise<void> {
       try {
         const result = await scan({ age: cli.age, scripts: cli.scripts, json: cli.json, cwd, allowlist, ci: cli.ci, failOn: cli.failOn, deep: cli.deep })
 
-        if (!cli.json) {
-          if (spinner) clearInterval(spinner)
-          readline.clearLine(process.stdout, 0)
-          readline.cursorTo(process.stdout, 0)
-          process.stdout.write('\x1B[?25h')
-          console.log(formatScanResult(result))
-        } else {
+        if (cli.json) {
           if (cli.ci) {
             console.log(JSON.stringify({
               pass: result.pass,
@@ -147,6 +164,14 @@ async function main(): Promise<void> {
           } else {
             console.log(JSON.stringify(result, null, 2))
           }
+        } else if (cli.sbom) {
+          console.log(generateSbom(result, getProjectName(cwd)))
+        } else {
+          if (spinner) clearInterval(spinner)
+          readline.clearLine(process.stdout, 0)
+          readline.cursorTo(process.stdout, 0)
+          process.stdout.write('\x1B[?25h')
+          console.log(formatScanResult(result))
         }
 
         if (token) {

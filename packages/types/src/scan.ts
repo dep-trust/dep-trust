@@ -96,6 +96,10 @@ export interface ScanSummary {
   freshness_flags: number
   script_flags: number
   lockfile_changes: number
+  maintainer_flags: number
+  typosquat_flags: number
+  code_flags: number
+  provenance_flags: number
   duration_ms: number
 }
 

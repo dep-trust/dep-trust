@@ -114,6 +114,10 @@ export function buildScanPayload(
       (result.diff?.added.length ?? 0) +
       (result.diff?.removed.length ?? 0) +
       (result.diff?.bumped.length ?? 0),
+    maintainer_flags: result.diff?.maintainerChanges.length ?? 0,
+    typosquat_flags: result.typosquats.length,
+    code_flags: result.codeAnalysis?.findings.length ?? 0,
+    provenance_flags: result.missingProvenance?.length ?? 0,
     duration_ms: Date.now() - opts.startedAt,
   }
 

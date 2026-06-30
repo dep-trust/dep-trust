@@ -69,7 +69,13 @@ export default async function ScansPage() {
           </thead>
           <tbody>
             {scans.map((scan) => {
-              const flags = scan.summary.freshness_flags + scan.summary.script_flags
+              const flags = 
+                scan.summary.freshness_flags + 
+                scan.summary.script_flags + 
+                (scan.summary.maintainer_flags ?? 0) +
+                (scan.summary.typosquat_flags ?? 0) +
+                (scan.summary.code_flags ?? 0) +
+                (scan.summary.provenance_flags ?? 0)
               return (
                 <tr key={scan.id}>
                   <td style={{ color: 'var(--color-text-secondary)', fontSize: 12 }}>

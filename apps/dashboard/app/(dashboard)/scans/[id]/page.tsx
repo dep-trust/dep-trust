@@ -39,6 +39,10 @@ export default async function ScanDetailPage({ params }: { params: Promise<{ id:
 
   const flaggedFreshness = findings.freshness.filter((f) => f.flagged)
   const newScripts = findings.scripts.filter((sc) => sc.status === 'new')
+  const maintainerChanges = findings.diff?.maintainerChanges ?? []
+  const typosquats = findings.typosquats ?? []
+  const codeFindings = findings.codeAnalysis?.findings ?? []
+  const missingProvenance = findings.missingProvenance ?? []
   const diff = findings.diff
   const diffTotal = (diff?.added.length ?? 0) + (diff?.removed.length ?? 0) + (diff?.bumped.length ?? 0)
 
@@ -81,6 +85,30 @@ export default async function ScanDetailPage({ params }: { params: Promise<{ id:
             {summary.lockfile_changes}
           </div>
           <div className="stat-label">Lockfile Changes</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value" style={{ color: (summary.maintainer_flags ?? 0) > 0 ? 'var(--color-accent)' : 'inherit' }}>
+            {summary.maintainer_flags ?? 0}
+          </div>
+          <div className="stat-label">Maintainers</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value" style={{ color: (summary.typosquat_flags ?? 0) > 0 ? 'var(--color-accent)' : 'inherit' }}>
+            {summary.typosquat_flags ?? 0}
+          </div>
+          <div className="stat-label">Typosquats</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value" style={{ color: (summary.code_flags ?? 0) > 0 ? 'var(--color-accent)' : 'inherit' }}>
+            {summary.code_flags ?? 0}
+          </div>
+          <div className="stat-label">Code Flags</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-value" style={{ color: (summary.provenance_flags ?? 0) > 0 ? 'var(--color-warning)' : 'inherit' }}>
+            {summary.provenance_flags ?? 0}
+          </div>
+          <div className="stat-label">Provenance</div>
         </div>
       </div>
 
@@ -164,6 +192,102 @@ export default async function ScanDetailPage({ params }: { params: Promise<{ id:
                   <td className="monospace">{d.name}</td>
                   <td style={{ color: 'var(--color-warning)' }}>bumped</td>
                   <td className="monospace">{d.from} → {d.to}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </FindingsSection>
+
+      <FindingsSection title="Maintainer Changes" count={maintainerChanges.length}>
+        {maintainerChanges.length === 0 ? (
+          <p style={{ padding: '16px', color: 'var(--color-text-secondary)', fontSize: 13 }}>No maintainer changes.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Added</th>
+                <th>Removed</th>
+              </tr>
+            </thead>
+            <tbody>
+              {maintainerChanges.map((m) => (
+                <tr key={m.name}>
+                  <td className="monospace" style={{ color: 'var(--color-accent)' }}>{m.name}</td>
+                  <td className="monospace" style={{ color: 'var(--color-success)' }}>{m.added.join(', ') || '—'}</td>
+                  <td className="monospace" style={{ color: 'var(--color-accent)' }}>{m.removed.join(', ') || '—'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </FindingsSection>
+
+      <FindingsSection title="Typosquat Warnings" count={typosquats.length}>
+        {typosquats.length === 0 ? (
+          <p style={{ padding: '16px', color: 'var(--color-text-secondary)', fontSize: 13 }}>No typosquat warnings.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Similar To</th>
+                <th>Distance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {typosquats.map((t) => (
+                <tr key={t.name}>
+                  <td className="monospace" style={{ color: t.confidence === 'high' ? 'var(--color-accent)' : 'var(--color-warning)' }}>{t.name}</td>
+                  <td className="monospace">{t.similarTo}</td>
+                  <td>{t.distance}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </FindingsSection>
+
+      <FindingsSection title="Code Analysis" count={codeFindings.length}>
+        {codeFindings.length === 0 ? (
+          <p style={{ padding: '16px', color: 'var(--color-text-secondary)', fontSize: 13 }}>No code analysis findings.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Pattern</th>
+                <th>File</th>
+              </tr>
+            </thead>
+            <tbody>
+              {codeFindings.map((c, i) => (
+                <tr key={i}>
+                  <td className="monospace" style={{ color: c.severity === 'critical' ? 'var(--color-accent)' : 'var(--color-warning)' }}>{c.name}</td>
+                  <td className="monospace">{c.pattern}</td>
+                  <td className="monospace">{c.file}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </FindingsSection>
+
+      <FindingsSection title="Missing Provenance" count={missingProvenance.length}>
+        {missingProvenance.length === 0 ? (
+          <p style={{ padding: '16px', color: 'var(--color-text-secondary)', fontSize: 13 }}>No flagged packages are missing provenance.</p>
+        ) : (
+          <table>
+            <thead>
+              <tr>
+                <th>Package</th>
+              </tr>
+            </thead>
+            <tbody>
+              {missingProvenance.map((p) => (
+                <tr key={p}>
+                  <td className="monospace" style={{ color: 'var(--color-warning)' }}>{p}</td>
                 </tr>
               ))}
             </tbody>
