@@ -1,0 +1,19 @@
+name: 'dep-trust scan'
+description: 'Scan npm dependencies for supply chain attack indicators'
+inputs:
+  age:
+    description: 'Freshness window in hours'
+    default: '72'
+  fail-on:
+    description: 'What findings to fail on (freshness, scripts, diff, all)'
+    default: 'all'
+  token:
+    description: 'dep-trust cloud token for dashboard sync'
+    required: false
+runs:
+  using: 'composite'
+  steps:
+    - run: npx dep-trust@latest scan --ci --age ${{ inputs.age }} --fail-on ${{ inputs.fail-on }} --json
+      shell: bash
+      env:
+        DEP_TRUST_TOKEN: ${{ inputs.token }}

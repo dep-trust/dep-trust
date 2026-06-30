@@ -1,6 +1,6 @@
 {
   "name": "dep-trust",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Scan your npm dependencies for supply chain attack indicators.",
   "license": "MIT",
   "type": "module",
@@ -8,7 +8,7 @@
     "node": ">=18.0.0"
   },
   "bin": {
-    "dep-trust": "./dist/cli.js"
+    "dep-trust": "dist/cli.js"
   },
   "preferGlobal": true,
   "main": "./dist/scan.js",

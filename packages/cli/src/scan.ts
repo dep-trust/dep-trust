@@ -12,7 +12,7 @@ const DEFAULT_OPTIONS: ScanOptions = {
 }
 
 export async function scan(
-  options?: Partial<ScanOptions> & { allowlist?: Set<string> },
+  options?: Partial<ScanOptions> & { allowlist?: Set<string>; failOn?: import('@dep-trust/types/scan').FailOn; ci?: boolean },
 ): Promise<ScanResult> {
   const opts = { ...DEFAULT_OPTIONS, ...options }
   const deps = parseLockfile(opts.cwd)
@@ -30,11 +30,38 @@ export async function scan(
     saveSeen(opts.cwd, scriptNames)
   }
 
+  const failedChecks: string[] = []
+  
+  const hasFreshness = freshness.some((f) => f.flagged)
+  const hasScripts = scripts.some((s) => s.status === 'new')
+  const hasDiff = (diff?.added.length ?? 0) > 0 || (diff?.removed.length ?? 0) > 0 || (diff?.bumped.length ?? 0) > 0
+
+  if (hasFreshness) failedChecks.push('freshness')
+  if (hasScripts) failedChecks.push('scripts')
+  if (hasDiff) failedChecks.push('diff')
+
+  let severity: 'clean' | 'warning' | 'critical' = 'clean'
+  if (hasScripts || hasFreshness) {
+    severity = 'critical'
+  } else if (hasDiff) {
+    severity = 'warning'
+  }
+
+  const failOn = options?.failOn ?? 'all'
+  let pass = true
+  if (failOn === 'all' && failedChecks.length > 0) pass = false
+  if (failOn === 'freshness' && hasFreshness) pass = false
+  if (failOn === 'scripts' && hasScripts) pass = false
+  if (failOn === 'diff' && hasDiff) pass = false
+
   return {
     freshness,
     scripts,
     diff,
     timestamp: new Date().toISOString(),
     packageCount: packages.length,
+    severity,
+    pass,
+    failedChecks,
   }
 }

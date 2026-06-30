@@ -21,8 +21,48 @@ export async function syncScan(
       signal: AbortSignal.timeout(10_000),
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+    if (process.env['GITHUB_ACTIONS'] === 'true' && process.env['GITHUB_EVENT_PATH']) {
+      await syncGithubPrComment(token, payload)
+    }
   } catch (err) {
     console.log(pc.dim(`sync failed: ${err instanceof Error ? err.message : 'unknown'}`))
+  }
+}
+
+async function syncGithubPrComment(token: string, payload: Omit<ScanRecord, 'id' | 'workspace_id' | 'created_at'>): Promise<void> {
+  try {
+    const eventPath = process.env['GITHUB_EVENT_PATH']
+    if (!eventPath) return
+
+    const eventData = JSON.parse(readFileSync(eventPath, 'utf-8'))
+    
+    // Only post on pull requests
+    if (!eventData.pull_request) return
+
+    const prNumber = eventData.pull_request.number
+    const repo = process.env['GITHUB_REPOSITORY'] // "owner/repo"
+
+    if (!prNumber || !repo) return
+
+    const [owner, repoName] = repo.split('/')
+
+    await fetch(`${API_BASE}/api/github/check`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        owner,
+        repo: repoName,
+        pr: prNumber,
+        scanResult: payload
+      }),
+      signal: AbortSignal.timeout(10_000),
+    })
+  } catch (err) {
+    console.log(pc.dim(`github pr comment failed: ${err instanceof Error ? err.message : 'unknown'}`))
   }
 }
 

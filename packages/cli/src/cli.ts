@@ -23,6 +23,8 @@ interface CliArgs {
   packageName: string | null
   token: string | null
   list: boolean
+  ci: boolean
+  failOn: import('@dep-trust/types/scan').FailOn
 }
 
 function parseArgs(argv: string[]): CliArgs {
@@ -36,6 +38,8 @@ function parseArgs(argv: string[]): CliArgs {
     packageName: null,
     token: null,
     list: false,
+    ci: false,
+    failOn: 'all',
   }
 
   for (let i = 1; i < args.length; i++) {
@@ -58,6 +62,16 @@ function parseArgs(argv: string[]): CliArgs {
       case '--token':
         parsed.token = args[++i] ?? null
         break
+      case '--ci':
+        parsed.ci = true
+        break
+      case '--fail-on': {
+        const val = args[++i]
+        if (val === 'freshness' || val === 'scripts' || val === 'diff' || val === 'all') {
+          parsed.failOn = val
+        }
+        break
+      }
       default:
         if (!arg.startsWith('--') && parsed.command !== 'auth') {
           parsed.packageName = arg
@@ -70,7 +84,7 @@ function parseArgs(argv: string[]): CliArgs {
 
 function printUsage(): void {
   console.log(`
-dep-trust v0.1.1 — npm supply chain audit
+dep-trust v0.1.3 — npm supply chain audit
 
 Usage:
   dep-trust scan                  Run full audit
@@ -109,7 +123,7 @@ async function main(): Promise<void> {
       }
 
       try {
-        const result = await scan({ age: cli.age, scripts: cli.scripts, json: cli.json, cwd, allowlist })
+        const result = await scan({ age: cli.age, scripts: cli.scripts, json: cli.json, cwd, allowlist, ci: cli.ci, failOn: cli.failOn })
 
         if (!cli.json) {
           if (spinner) clearInterval(spinner)
@@ -118,7 +132,16 @@ async function main(): Promise<void> {
           process.stdout.write('\x1B[?25h')
           console.log(formatScanResult(result))
         } else {
-          console.log(JSON.stringify(result, null, 2))
+          if (cli.ci) {
+            console.log(JSON.stringify({
+              pass: result.pass,
+              severity: result.severity,
+              failedChecks: result.failedChecks,
+              ...result
+            }, null, 2))
+          } else {
+            console.log(JSON.stringify(result, null, 2))
+          }
         }
 
         if (token) {
@@ -129,6 +152,10 @@ async function main(): Promise<void> {
             startedAt,
           })
           await syncScan(token, payload)
+        }
+
+        if (cli.ci && result.pass === false) {
+          process.exit(1)
         }
       } finally {
         if (spinner) {

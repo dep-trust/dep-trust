@@ -5,6 +5,8 @@ export interface ScanOptions {
   cwd: string
 }
 
+export type FailOn = 'freshness' | 'scripts' | 'diff' | 'all'
+
 export interface PackageMeta {
   name: string
   version: string
@@ -48,6 +50,9 @@ export interface ScanResult {
   diff: SnapshotDiff | null
   timestamp: string
   packageCount: number
+  severity?: 'clean' | 'warning' | 'critical'
+  pass?: boolean
+  failedChecks?: string[]
 }
 
 export interface ScanSummary {
