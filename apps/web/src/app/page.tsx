@@ -82,76 +82,64 @@ export default function Home() {
             <h2 className="font-body text-2xl font-medium tracking-tight text-text-display">
               Six checks. One command.
             </h2>
-            <ol className="mt-12 space-y-10">
-              <li className="flex gap-6">
-                <span className="font-mono text-[11px] font-bold text-accent mt-1 tracking-[0.06em]">
-                  01
-                </span>
-                <div>
-                  <p className="font-body font-medium text-text-display">Freshness check</p>
-                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Queries the npm registry for publish timestamps. Flags any dependency whose
-                    latest version was pushed within the last 72 hours — the primary attack window.
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-6">
-                <span className="font-mono text-[11px] font-bold text-accent mt-1 tracking-[0.06em]">
-                  02
-                </span>
-                <div>
-                  <p className="font-body font-medium text-text-display">Maintainer Change Detection</p>
-                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Diffs your dependency maintainers against a baseline snapshot. Automatically flags when a new, unknown maintainer publishes a patch to a package you rely on.
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-6">
-                <span className="font-mono text-[11px] font-bold text-accent mt-1 tracking-[0.06em]">
-                  03
-                </span>
-                <div>
-                  <p className="font-body font-medium text-text-display">Typosquat Detection</p>
-                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Compares your dependency tree against a local corpus of the top 2,500 most popular npm packages using a highly-optimized Levenshtein distance algorithm.
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-6">
-                <span className="font-mono text-[11px] font-bold text-accent mt-1 tracking-[0.06em]">
-                  04
-                </span>
-                <div>
-                  <p className="font-body font-medium text-text-display">Deep Static Analysis</p>
-                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Runs static analysis on suspicious dependencies, looking for obfuscated payloads, credential harvesting, dynamic execution (<code>eval</code>), and hidden HTTP requests.
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-6">
-                <span className="font-mono text-[11px] font-bold text-accent mt-1 tracking-[0.06em]">
-                  05
-                </span>
-                <div>
-                  <p className="font-body font-medium text-text-display">Install Script Warnings</p>
-                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Scans every package in node_modules for preinstall, install, and postinstall
-                    hooks. New scripts are highlighted. Allowlisted packages are de-emphasized.
-                  </p>
-                </div>
-              </li>
-              <li className="flex gap-6">
-                <span className="font-mono text-[11px] font-bold text-accent mt-1 tracking-[0.06em]">
-                  06
-                </span>
-                <div>
-                  <p className="font-body font-medium text-text-display">SLSA Provenance Validation</p>
-                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Checks the npm registry for signed attestations, warning you when a flagged package lacks a verifiable build provenance.
-                  </p>
-                </div>
-              </li>
-            </ol>
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Box 1 - Wide */}
+              <div className="md:col-span-2 bg-surface border border-border p-8 rounded-2xl hover-scale">
+                <span className="font-mono text-[11px] font-bold text-accent tracking-[0.06em]">01</span>
+                <p className="mt-4 font-body text-xl font-medium text-text-display">Freshness Check</p>
+                <p className="mt-3 text-sm text-text-secondary leading-relaxed">
+                  Queries the npm registry for publish timestamps. Flags any dependency whose
+                  latest version was pushed within the last 72 hours — the primary attack window.
+                </p>
+              </div>
+
+              {/* Box 2 - Tall or standard */}
+              <div className="bg-surface border border-border p-8 rounded-2xl hover-scale bg-gradient-to-b from-surface to-surface-raised">
+                <span className="font-mono text-[11px] font-bold text-accent tracking-[0.06em]">02</span>
+                <p className="mt-4 font-body text-xl font-medium text-text-display">Maintainer Changes</p>
+                <p className="mt-3 text-sm text-text-secondary leading-relaxed">
+                  Diffs dependency maintainers against a baseline snapshot. Automatically flags when an unknown maintainer publishes a patch.
+                </p>
+              </div>
+
+              {/* Box 3 */}
+              <div className="bg-surface border border-border p-8 rounded-2xl hover-scale">
+                <span className="font-mono text-[11px] font-bold text-accent tracking-[0.06em]">03</span>
+                <p className="mt-4 font-body text-xl font-medium text-text-display">Typosquatting</p>
+                <p className="mt-3 text-sm text-text-secondary leading-relaxed">
+                  Compares trees against a corpus of 2,500+ popular npm packages using an optimized Levenshtein algorithm.
+                </p>
+              </div>
+
+              {/* Box 4 - Wide */}
+              <div className="md:col-span-2 bg-surface border border-border p-8 rounded-2xl hover-scale relative overflow-hidden">
+                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-accent opacity-5 rounded-full blur-[40px]"></div>
+                <span className="font-mono text-[11px] font-bold text-accent tracking-[0.06em]">04</span>
+                <p className="mt-4 font-body text-xl font-medium text-text-display">Deep Static Analysis</p>
+                <p className="mt-3 text-sm text-text-secondary leading-relaxed max-w-md">
+                  Runs static analysis on suspicious dependencies, looking for obfuscated payloads, credential harvesting, dynamic execution (<code>eval</code>), and hidden HTTP requests.
+                </p>
+              </div>
+
+              {/* Box 5 */}
+              <div className="md:col-span-1 bg-surface border border-border p-8 rounded-2xl hover-scale">
+                <span className="font-mono text-[11px] font-bold text-accent tracking-[0.06em]">05</span>
+                <p className="mt-4 font-body text-xl font-medium text-text-display">Install Scripts</p>
+                <p className="mt-3 text-sm text-text-secondary leading-relaxed">
+                  Scans node_modules for preinstall & postinstall hooks. New scripts are instantly highlighted.
+                </p>
+              </div>
+
+              {/* Box 6 - Wide */}
+              <div className="md:col-span-2 lg:col-span-3 bg-text-display text-surface border border-border-visible p-8 rounded-2xl hover-scale relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-black/20 to-transparent"></div>
+                <span className="font-mono text-[11px] font-bold text-surface-raised tracking-[0.06em]">06</span>
+                <p className="mt-4 font-body text-2xl font-medium text-surface">SLSA Provenance Validation</p>
+                <p className="mt-3 text-sm text-surface-raised leading-relaxed max-w-xl">
+                  Checks the npm registry for signed attestations, warning you when a flagged package lacks a verifiable build provenance.
+                </p>
+              </div>
+            </div>
           </div>
         </section>
 
