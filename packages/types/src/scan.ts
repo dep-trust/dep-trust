@@ -3,9 +3,10 @@ export interface ScanOptions {
   scripts: boolean
   json: boolean
   cwd: string
+  deep: boolean
 }
 
-export type FailOn = 'freshness' | 'scripts' | 'diff' | 'maintainers' | 'typosquat' | 'all'
+export type FailOn = 'freshness' | 'scripts' | 'diff' | 'maintainers' | 'typosquat' | 'code' | 'all'
 
 export interface PackageMeta {
   name: string
@@ -61,11 +62,26 @@ export interface TyposquatResult {
   confidence: 'high' | 'medium'
 }
 
+export interface CodeFinding {
+  name: string
+  file: string
+  pattern: string
+  severity: 'critical' | 'warning'
+  snippet: string
+}
+
+export interface CodeAnalysisResult {
+  findings: CodeFinding[]
+  packagesScanned: number
+  filesScanned: number
+}
+
 export interface ScanResult {
   freshness: FreshnessResult[]
   scripts: ScriptResult[]
   diff: SnapshotDiff | null
   typosquats: TyposquatResult[]
+  codeAnalysis?: CodeAnalysisResult
   timestamp: string
   packageCount: number
   severity?: 'clean' | 'warning' | 'critical'
@@ -86,6 +102,7 @@ export interface ScanFindings {
   scripts: ScriptResult[]
   diff: SnapshotDiff | null
   typosquats: TyposquatResult[]
+  codeAnalysis?: CodeAnalysisResult
 }
 
 export interface ScanRecord {

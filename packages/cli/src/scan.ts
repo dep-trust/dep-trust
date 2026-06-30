@@ -3,6 +3,7 @@ import { parseLockfile } from './lockfile'
 import { detectScripts } from './scripts'
 import { diffSnapshot, saveSeen } from './snapshot'
 import { detectTyposquats } from './typosquat'
+import { analyzePackageCode } from './code-analysis'
 import topPackagesJson from './data/top-packages.json'
 import type { ScanOptions, ScanResult } from '@dep-trust/types/scan'
 
@@ -13,6 +14,7 @@ const DEFAULT_OPTIONS: ScanOptions = {
   scripts: true,
   json: false,
   cwd: process.cwd(),
+  deep: false,
 }
 
 export async function scan(
@@ -43,6 +45,16 @@ export async function scan(
     saveSeen(opts.cwd, scriptNames)
   }
 
+  const flaggedPackages = new Set<string>()
+  for (const f of freshness) if (f.flagged) flaggedPackages.add(f.name)
+  for (const s of scripts) if (s.status === 'new') flaggedPackages.add(s.name)
+  for (const t of typosquats) flaggedPackages.add(t.name)
+
+  const packagesToScan = opts.deep ? packages.map(p => p.name) : [...flaggedPackages]
+  const codeAnalysis = packagesToScan.length > 0 
+    ? analyzePackageCode(opts.cwd, packagesToScan, allowlist) 
+    : { findings: [], packagesScanned: 0, filesScanned: 0 }
+
   const failedChecks: string[] = []
   
   const hasFreshness = freshness.some((f) => f.flagged)
@@ -50,17 +62,19 @@ export async function scan(
   const hasDiff = (diff?.added.length ?? 0) > 0 || (diff?.removed.length ?? 0) > 0 || (diff?.bumped.length ?? 0) > 0
   const hasMaintainerChanges = (diff?.maintainerChanges.length ?? 0) > 0
   const hasTyposquats = typosquats.length > 0
+  const hasCodeFlags = codeAnalysis.findings.length > 0
 
   if (hasFreshness) failedChecks.push('freshness')
   if (hasScripts) failedChecks.push('scripts')
   if (hasDiff) failedChecks.push('diff')
   if (hasMaintainerChanges) failedChecks.push('maintainers')
   if (hasTyposquats) failedChecks.push('typosquat')
+  if (hasCodeFlags) failedChecks.push('code')
 
   let severity: 'clean' | 'warning' | 'critical' = 'clean'
-  if (hasScripts || hasFreshness || hasMaintainerChanges || hasTyposquats) {
+  if (hasScripts || hasFreshness || hasMaintainerChanges || hasTyposquats || codeAnalysis.findings.some(f => f.severity === 'critical')) {
     severity = 'critical'
-  } else if (hasDiff) {
+  } else if (hasDiff || hasCodeFlags) {
     severity = 'warning'
   }
 
@@ -72,12 +86,14 @@ export async function scan(
   if (failOn === 'diff' && hasDiff) pass = false
   if (failOn === 'maintainers' && hasMaintainerChanges) pass = false
   if (failOn === 'typosquat' && hasTyposquats) pass = false
+  if (failOn === 'code' && hasCodeFlags) pass = false
 
   return {
     freshness,
     scripts,
     diff,
     typosquats,
+    codeAnalysis,
     timestamp: new Date().toISOString(),
     packageCount: packages.length,
     severity,

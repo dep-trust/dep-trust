@@ -24,6 +24,7 @@ interface CliArgs {
   token: string | null
   list: boolean
   ci: boolean
+  deep: boolean
   failOn: import('@dep-trust/types/scan').FailOn
 }
 
@@ -39,6 +40,7 @@ function parseArgs(argv: string[]): CliArgs {
     token: null,
     list: false,
     ci: false,
+    deep: false,
     failOn: 'all',
   }
 
@@ -65,9 +67,12 @@ function parseArgs(argv: string[]): CliArgs {
       case '--ci':
         parsed.ci = true
         break
+      case '--deep':
+        parsed.deep = true
+        break
       case '--fail-on': {
         const val = args[++i]
-        if (val === 'freshness' || val === 'scripts' || val === 'diff' || val === 'maintainers' || val === 'all') {
+        if (val === 'freshness' || val === 'scripts' || val === 'diff' || val === 'maintainers' || val === 'typosquat' || val === 'code' || val === 'all') {
           parsed.failOn = val as import('@dep-trust/types/scan').FailOn
         }
         break
@@ -123,7 +128,7 @@ async function main(): Promise<void> {
       }
 
       try {
-        const result = await scan({ age: cli.age, scripts: cli.scripts, json: cli.json, cwd, allowlist, ci: cli.ci, failOn: cli.failOn })
+        const result = await scan({ age: cli.age, scripts: cli.scripts, json: cli.json, cwd, allowlist, ci: cli.ci, failOn: cli.failOn, deep: cli.deep })
 
         if (!cli.json) {
           if (spinner) clearInterval(spinner)

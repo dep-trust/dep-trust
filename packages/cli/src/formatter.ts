@@ -51,6 +51,17 @@ export function formatScanResult(result: ScanResult): string {
     lines.push('')
   }
 
+  if (result.codeAnalysis && result.codeAnalysis.findings.length > 0) {
+    lines.push(pc.bold(`CODE ANALYSIS (${result.codeAnalysis.packagesScanned} packages scanned)`))
+    for (const finding of result.codeAnalysis.findings) {
+      const color = finding.severity === 'critical' ? pc.red : pc.yellow
+      const icon = finding.severity === 'critical' ? '✗' : '?'
+      lines.push(`  ${color(icon)}  ${color(finding.name.padEnd(20))} ${finding.pattern} in ${finding.file}`)
+      lines.push(`       ${pc.dim(finding.snippet)}`)
+    }
+    lines.push('')
+  }
+
   lines.push(formatSummary(result))
   lines.push(pc.dim('run dep-trust scan --json for machine-readable output'))
   lines.push('')
@@ -132,6 +143,9 @@ function formatSummary(result: ScanResult): string {
 
   if (maintainerChanges > 0) parts.push(pc.red(`${maintainerChanges} maintainer change${maintainerChanges > 1 ? 's' : ''}`))
   if (result.typosquats.length > 0) parts.push(pc.red(`${result.typosquats.length} typosquat warning${result.typosquats.length > 1 ? 's' : ''}`))
+  
+  const codeFlags = result.codeAnalysis?.findings.length ?? 0
+  if (codeFlags > 0) parts.push(pc.red(`${codeFlags} code flag${codeFlags > 1 ? 's' : ''}`))
 
   return `${pc.bold('SUMMARY')}  ${parts.join('   ')}`
 }
