@@ -49,7 +49,7 @@ export default function Home() {
         {/* Problem — Secondary layer: Space Grotesk body text */}
         <section className="px-6 py-32 border-t border-border animate-stagger-4 relative overflow-hidden">
           <div className="absolute top-0 right-1/4 w-[50vw] h-[50vw] bg-accent opacity-5 rounded-full blur-[100px] pointer-events-none" />
-          <div className="max-w-3xl mx-auto relative z-10">
+          <div className="max-w-5xl mx-auto relative z-10">
             <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-text-secondary mb-4">
               The problem
             </p>
@@ -75,7 +75,7 @@ export default function Home() {
         {/* How it works — Three numbered steps, Space Mono numbers as accent */}
         <section className="px-6 py-32 border-t border-border relative overflow-hidden">
           <div className="absolute top-1/2 left-0 w-[40vw] h-[40vw] bg-interactive opacity-5 rounded-full blur-[120px] pointer-events-none -translate-y-1/2" />
-          <div className="max-w-3xl mx-auto relative z-10">
+          <div className="max-w-5xl mx-auto relative z-10">
             <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-text-secondary mb-4">
               How it works
             </p>
@@ -146,7 +146,7 @@ export default function Home() {
         {/* Install — Code blocks with copy */}
         <section className="px-6 py-32 border-t border-border relative overflow-hidden">
           <div className="absolute bottom-0 right-0 w-[60vw] h-[30vw] bg-success opacity-5 rounded-full blur-[150px] pointer-events-none" />
-          <div className="max-w-3xl mx-auto relative z-10">
+          <div className="max-w-5xl mx-auto relative z-10">
             <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-text-secondary mb-4">
               Get started
             </p>
