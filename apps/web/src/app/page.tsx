@@ -20,8 +20,8 @@ export default function Home() {
                 Know what your dependencies are doing.
               </h1>
               <p className="mt-8 text-lg text-text-secondary max-w-xl leading-relaxed">
-                dep-trust scans your npm dependency tree for supply chain attack indicators — recently
-                published packages, suspicious install scripts, and unexpected lockfile changes.
+                dep-trust scans your npm dependency tree for supply chain attack indicators — freshly published packages, 
+                typosquatting, obfuscated code payloads, malicious install scripts, and missing SLSA provenance.
               </p>
               <div className="mt-10 flex items-center gap-6">
                 <a
@@ -61,11 +61,9 @@ export default function Home() {
                 window is typically hours — not days.
               </p>
               <p>
-                dep-trust fills the gap. It flags freshly published dependencies, detects install
-                hook scripts that run arbitrary code during{' '}
-                <code className="font-mono text-[13px] text-text-primary">npm install</code>, and
-                diffs your lockfile against a known-good snapshot to surface unexpected changes
-                before they reach production.
+                dep-trust fills the gap. It flags freshly published dependencies, detects typosquatted packages, 
+                deep-scans source code for obfuscated payloads, validates SLSA provenance, and tracks 
+                maintainer changes—all before malicious code reaches production.
               </p>
             </div>
           </div>
@@ -78,7 +76,7 @@ export default function Home() {
               How it works
             </p>
             <h2 className="font-body text-2xl font-medium tracking-tight text-text-display">
-              Three checks. One command.
+              Six checks. One command.
             </h2>
             <ol className="mt-12 space-y-10">
               <li className="flex gap-6">
@@ -98,10 +96,9 @@ export default function Home() {
                   02
                 </span>
                 <div>
-                  <p className="font-body font-medium text-text-display">Install script detection</p>
+                  <p className="font-body font-medium text-text-display">Maintainer Change Detection</p>
                   <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Scans every package in node_modules for preinstall, install, and postinstall
-                    hooks. New scripts are highlighted. Allowlisted packages are de-emphasized.
+                    Diffs your dependency maintainers against a baseline snapshot. Automatically flags when a new, unknown maintainer publishes a patch to a package you rely on.
                   </p>
                 </div>
               </li>
@@ -110,10 +107,43 @@ export default function Home() {
                   03
                 </span>
                 <div>
-                  <p className="font-body font-medium text-text-display">Lockfile diff</p>
+                  <p className="font-body font-medium text-text-display">Typosquat Detection</p>
                   <p className="mt-2 text-sm text-text-secondary leading-relaxed">
-                    Snapshots your lockfile on first run. On subsequent runs, diffs the current state
-                    against the baseline to surface added, removed, and bumped packages.
+                    Compares your dependency tree against a local corpus of the top 2,500 most popular npm packages using a highly-optimized Levenshtein distance algorithm.
+                  </p>
+                </div>
+              </li>
+              <li className="flex gap-6">
+                <span className="font-mono text-[11px] font-bold text-accent mt-1 tracking-[0.06em]">
+                  04
+                </span>
+                <div>
+                  <p className="font-body font-medium text-text-display">Deep Static Analysis</p>
+                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Runs static analysis on suspicious dependencies, looking for obfuscated payloads, credential harvesting, dynamic execution (<code>eval</code>), and hidden HTTP requests.
+                  </p>
+                </div>
+              </li>
+              <li className="flex gap-6">
+                <span className="font-mono text-[11px] font-bold text-accent mt-1 tracking-[0.06em]">
+                  05
+                </span>
+                <div>
+                  <p className="font-body font-medium text-text-display">Install Script Warnings</p>
+                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Scans every package in node_modules for preinstall, install, and postinstall
+                    hooks. New scripts are highlighted. Allowlisted packages are de-emphasized.
+                  </p>
+                </div>
+              </li>
+              <li className="flex gap-6">
+                <span className="font-mono text-[11px] font-bold text-accent mt-1 tracking-[0.06em]">
+                  06
+                </span>
+                <div>
+                  <p className="font-body font-medium text-text-display">SLSA Provenance Validation</p>
+                  <p className="mt-2 text-sm text-text-secondary leading-relaxed">
+                    Checks the npm registry for signed attestations, warning you when a flagged package lacks a verifiable build provenance.
                   </p>
                 </div>
               </li>
@@ -133,7 +163,7 @@ export default function Home() {
             <div className="space-y-6">
               <CopyBlock code="npm install -g dep-trust" label="Install" />
               <CopyBlock
-                code={`dep-trust scan\ndep-trust scan --age 24\ndep-trust snapshot`}
+                code={`dep-trust scan\ndep-trust scan --deep\ndep-trust scan --sbom\ndep-trust snapshot`}
                 label="Usage"
               />
             </div>
