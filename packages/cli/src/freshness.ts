@@ -21,6 +21,7 @@ export async function checkFreshness(
           ageHours: null,
           flagged: false,
           maintainers: info.maintainers,
+          hasProvenance: info.hasProvenance,
           error: info.error,
         } satisfies FreshnessResult
       }
@@ -35,6 +36,7 @@ export async function checkFreshness(
         ageHours,
         flagged: ageHours < maxAgeHours,
         maintainers: info.maintainers,
+        hasProvenance: info.hasProvenance,
         error: null,
       } satisfies FreshnessResult
     },

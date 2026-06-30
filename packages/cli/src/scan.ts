@@ -64,6 +64,15 @@ export async function scan(
   const hasTyposquats = typosquats.length > 0
   const hasCodeFlags = codeAnalysis.findings.length > 0
 
+  const missingProvenance: string[] = []
+  const allFlagged = new Set([...flaggedPackages, ...packagesToScan.filter(p => codeAnalysis.findings.some(f => f.name === p))])
+  
+  for (const f of freshness) {
+    if (allFlagged.has(f.name) && !f.hasProvenance) {
+      missingProvenance.push(f.name)
+    }
+  }
+
   if (hasFreshness) failedChecks.push('freshness')
   if (hasScripts) failedChecks.push('scripts')
   if (hasDiff) failedChecks.push('diff')
@@ -74,7 +83,7 @@ export async function scan(
   let severity: 'clean' | 'warning' | 'critical' = 'clean'
   if (hasScripts || hasFreshness || hasMaintainerChanges || hasTyposquats || codeAnalysis.findings.some(f => f.severity === 'critical')) {
     severity = 'critical'
-  } else if (hasDiff || hasCodeFlags) {
+  } else if (hasDiff || hasCodeFlags || missingProvenance.length > 0) {
     severity = 'warning'
   }
 
@@ -88,12 +97,14 @@ export async function scan(
   if (failOn === 'typosquat' && hasTyposquats) pass = false
   if (failOn === 'code' && hasCodeFlags) pass = false
 
+  // Return missing provenance in ScanResult
   return {
     freshness,
     scripts,
     diff,
     typosquats,
     codeAnalysis,
+    missingProvenance,
     timestamp: new Date().toISOString(),
     packageCount: packages.length,
     severity,

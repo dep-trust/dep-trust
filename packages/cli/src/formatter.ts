@@ -62,6 +62,14 @@ export function formatScanResult(result: ScanResult): string {
     lines.push('')
   }
 
+  if (result.missingProvenance && result.missingProvenance.length > 0) {
+    lines.push(pc.bold('PROVENANCE WARNINGS'))
+    for (const pkg of result.missingProvenance) {
+      lines.push(`  ${pc.yellow('?')}  ${pc.yellow(pkg.padEnd(20))} missing SLSA provenance (flagged package)`)
+    }
+    lines.push('')
+  }
+
   lines.push(formatSummary(result))
   lines.push(pc.dim('run dep-trust scan --json for machine-readable output'))
   lines.push('')
@@ -146,6 +154,9 @@ function formatSummary(result: ScanResult): string {
   
   const codeFlags = result.codeAnalysis?.findings.length ?? 0
   if (codeFlags > 0) parts.push(pc.red(`${codeFlags} code flag${codeFlags > 1 ? 's' : ''}`))
+
+  const missingProv = result.missingProvenance?.length ?? 0
+  if (missingProv > 0) parts.push(pc.yellow(`${missingProv} missing provenance`))
 
   return `${pc.bold('SUMMARY')}  ${parts.join('   ')}`
 }

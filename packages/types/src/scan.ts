@@ -20,6 +20,7 @@ export interface FreshnessResult {
   ageHours: number | null
   flagged: boolean
   maintainers: string[]
+  hasProvenance: boolean
   error: string | null
 }
 
@@ -82,6 +83,7 @@ export interface ScanResult {
   diff: SnapshotDiff | null
   typosquats: TyposquatResult[]
   codeAnalysis?: CodeAnalysisResult
+  missingProvenance?: string[]
   timestamp: string
   packageCount: number
   severity?: 'clean' | 'warning' | 'critical'
@@ -103,6 +105,7 @@ export interface ScanFindings {
   diff: SnapshotDiff | null
   typosquats: TyposquatResult[]
   codeAnalysis?: CodeAnalysisResult
+  missingProvenance?: string[]
 }
 
 export interface ScanRecord {

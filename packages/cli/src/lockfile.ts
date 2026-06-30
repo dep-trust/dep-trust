@@ -9,6 +9,9 @@ export function parseLockfile(cwd: string): LockfileDependency[] {
   const pnpmLock = tryReadFile(join(cwd, 'pnpm-lock.yaml'))
   if (pnpmLock) return parsePnpmLock(pnpmLock)
 
+  const yarnLock = tryReadFile(join(cwd, 'yarn.lock'))
+  if (yarnLock) return parseYarnLock(yarnLock)
+
   return []
 }
 
@@ -89,6 +92,55 @@ export function parsePnpmLock(content: string): LockfileDependency[] {
 
   flushEntry(currentPath, currentVersion, currentIntegrity, deps)
   return deps
+}
+
+export function parseYarnLock(content: string): LockfileDependency[] {
+  const deps: LockfileDependency[] = []
+  const lines = content.split('\n')
+  
+  let currentName = ''
+  let currentVersion = ''
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    if (line.startsWith('#') || line.trim() === '') continue
+    
+    // Header line, e.g., "package@^1.0.0": or "package@npm:^1.0.0":
+    if (!line.startsWith(' ') && !line.startsWith('\t') && line.endsWith(':')) {
+      if (currentName && currentVersion) {
+        deps.push({ name: currentName, version: currentVersion })
+      }
+      currentVersion = ''
+      
+      const header = line.slice(0, -1).trim()
+      const firstSpec = header.split(',')[0].trim().replace(/^"|'|"$|'$/g, '')
+      const name = extractPackageName(firstSpec)
+      if (name) currentName = name
+      else currentName = ''
+      continue
+    }
+    
+    if (currentName && line.trim().startsWith('version')) {
+      const match = line.match(/version\s+(?:"|')?([^"'\s]+)(?:"|')?/)
+      if (match) {
+        currentVersion = match[1]
+      }
+    }
+  }
+  
+  if (currentName && currentVersion) {
+    deps.push({ name: currentName, version: currentVersion })
+  }
+  
+  // Deduplicate since yarn.lock can have the same resolved version multiple times
+  const unique = new Map<string, string>()
+  for (const dep of deps) {
+    unique.set(`${dep.name}@${dep.version}`, dep.version)
+  }
+  
+  return Array.from(unique.entries()).map(([key, version]) => {
+    return { name: key.substring(0, key.lastIndexOf('@')), version }
+  })
 }
 
 function extractVersionFromPath(path: string): string {
