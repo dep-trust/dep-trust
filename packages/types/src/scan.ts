@@ -5,7 +5,7 @@ export interface ScanOptions {
   cwd: string
 }
 
-export type FailOn = 'freshness' | 'scripts' | 'diff' | 'all'
+export type FailOn = 'freshness' | 'scripts' | 'diff' | 'maintainers' | 'all'
 
 export interface PackageMeta {
   name: string
@@ -33,6 +33,14 @@ export interface LockfileDependency {
   integrity?: string
 }
 
+export interface MaintainerChange {
+  name: string
+  previous: string[]
+  current: string[]
+  added: string[]
+  removed: string[]
+}
+
 export interface SnapshotDiff {
   added: LockfileDependency[]
   removed: LockfileDependency[]
@@ -41,6 +49,7 @@ export interface SnapshotDiff {
     from: string
     to: string
   }>
+  maintainerChanges: MaintainerChange[]
   snapshotDate: string | null
 }
 

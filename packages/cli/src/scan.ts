@@ -19,11 +19,19 @@ export async function scan(
   const packages = deps.map((dep) => ({ name: dep.name, version: dep.version }))
   const allowlist = options?.allowlist ?? new Set<string>()
 
-  const [freshness, scripts, diff] = await Promise.all([
+  const [freshness, scripts] = await Promise.all([
     checkFreshness(packages, opts.age),
     Promise.resolve(opts.scripts ? detectScripts(opts.cwd, allowlist) : []),
-    Promise.resolve(diffSnapshot(opts.cwd)),
   ])
+
+  const currentMaintainers: Record<string, string[]> = {}
+  for (const f of freshness) {
+    if (f.maintainers.length > 0) {
+      currentMaintainers[f.name] = f.maintainers
+    }
+  }
+
+  const diff = diffSnapshot(opts.cwd, currentMaintainers)
 
   if (opts.scripts) {
     const scriptNames = scripts.map((s) => s.name)
@@ -35,13 +43,15 @@ export async function scan(
   const hasFreshness = freshness.some((f) => f.flagged)
   const hasScripts = scripts.some((s) => s.status === 'new')
   const hasDiff = (diff?.added.length ?? 0) > 0 || (diff?.removed.length ?? 0) > 0 || (diff?.bumped.length ?? 0) > 0
+  const hasMaintainerChanges = (diff?.maintainerChanges.length ?? 0) > 0
 
   if (hasFreshness) failedChecks.push('freshness')
   if (hasScripts) failedChecks.push('scripts')
   if (hasDiff) failedChecks.push('diff')
+  if (hasMaintainerChanges) failedChecks.push('maintainers')
 
   let severity: 'clean' | 'warning' | 'critical' = 'clean'
-  if (hasScripts || hasFreshness) {
+  if (hasScripts || hasFreshness || hasMaintainerChanges) {
     severity = 'critical'
   } else if (hasDiff) {
     severity = 'warning'
@@ -53,6 +63,7 @@ export async function scan(
   if (failOn === 'freshness' && hasFreshness) pass = false
   if (failOn === 'scripts' && hasScripts) pass = false
   if (failOn === 'diff' && hasDiff) pass = false
+  if (failOn === 'maintainers' && hasMaintainerChanges) pass = false
 
   return {
     freshness,

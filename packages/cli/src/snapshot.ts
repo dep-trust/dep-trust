@@ -6,9 +6,10 @@ import type { LockfileDependency, SnapshotDiff } from '@dep-trust/types/scan'
 interface Snapshot {
   date: string
   dependencies: Record<string, string>
+  maintainers?: Record<string, string[]>
 }
 
-export function saveSnapshot(cwd: string): void {
+export function saveSnapshot(cwd: string, maintainers?: Record<string, string[]>): void {
   const deps = parseLockfile(cwd)
   const depMap: Record<string, string> = {}
   for (const dep of deps) {
@@ -18,6 +19,7 @@ export function saveSnapshot(cwd: string): void {
   const snapshot: Snapshot = {
     date: new Date().toISOString(),
     dependencies: depMap,
+    maintainers,
   }
 
   const dir = join(cwd, '.dep-trust')
@@ -25,7 +27,7 @@ export function saveSnapshot(cwd: string): void {
   writeFileSync(join(dir, 'snapshot.json'), JSON.stringify(snapshot, null, 2) + '\n')
 }
 
-export function diffSnapshot(cwd: string): SnapshotDiff | null {
+export function diffSnapshot(cwd: string, currentMaintainers?: Record<string, string[]>): SnapshotDiff | null {
   const snapshotPath = join(cwd, '.dep-trust', 'snapshot.json')
   if (!existsSync(snapshotPath)) return null
 
@@ -45,6 +47,7 @@ export function diffSnapshot(cwd: string): SnapshotDiff | null {
   const added: LockfileDependency[] = []
   const removed: LockfileDependency[] = []
   const bumped: SnapshotDiff['bumped'] = []
+  const maintainerChanges: import('@dep-trust/types/scan').MaintainerChange[] = []
 
   for (const [name, version] of currentMap) {
     const oldVersion = snapshot.dependencies[name]
@@ -61,10 +64,34 @@ export function diffSnapshot(cwd: string): SnapshotDiff | null {
     }
   }
 
+  if (snapshot.maintainers && currentMaintainers) {
+    for (const [name, current] of Object.entries(currentMaintainers)) {
+      const previous = snapshot.maintainers[name]
+      if (!previous) continue
+
+      const currentSet = new Set(current)
+      const previousSet = new Set(previous)
+
+      const addedMaintainers = current.filter(m => !previousSet.has(m))
+      const removedMaintainers = previous.filter(m => !currentSet.has(m))
+
+      if (addedMaintainers.length > 0 || removedMaintainers.length > 0) {
+        maintainerChanges.push({
+          name,
+          previous,
+          current,
+          added: addedMaintainers,
+          removed: removedMaintainers
+        })
+      }
+    }
+  }
+
   return {
     added,
     removed,
     bumped,
+    maintainerChanges,
     snapshotDate: snapshot.date,
   }
 }

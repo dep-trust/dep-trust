@@ -29,6 +29,18 @@ export function formatScanResult(result: ScanResult): string {
     formatDiff(result.diff, lines)
   }
 
+  if ((result.diff?.maintainerChanges?.length ?? 0) > 0) {
+    lines.push(pc.bold('MAINTAINER CHANGES'))
+    for (const change of result.diff!.maintainerChanges) {
+      const parts: string[] = []
+      for (const added of change.added) parts.push(pc.yellow(`+${added} (new)`))
+      for (const removed of change.removed) parts.push(pc.red(`-${removed} (removed)`))
+      
+      lines.push(`  ${pc.red('✗')}  ${pc.red(change.name.padEnd(20))} ${parts.join('  ')}`)
+    }
+    lines.push('')
+  }
+
   lines.push(formatSummary(result))
   lines.push(pc.dim('run dep-trust scan --json for machine-readable output'))
   lines.push('')
@@ -95,6 +107,7 @@ function formatSummary(result: ScanResult): string {
     (result.diff?.added.length ?? 0) +
     (result.diff?.removed.length ?? 0) +
     (result.diff?.bumped.length ?? 0)
+  const maintainerChanges = result.diff?.maintainerChanges.length ?? 0
 
   const parts: string[] = []
 
@@ -106,6 +119,8 @@ function formatSummary(result: ScanResult): string {
 
   if (changes > 0) parts.push(pc.yellow(`${changes} lockfile change${changes > 1 ? 's' : ''}`))
   else parts.push(pc.green('0 lockfile changes'))
+
+  if (maintainerChanges > 0) parts.push(pc.red(`${maintainerChanges} maintainer change${maintainerChanges > 1 ? 's' : ''}`))
 
   return `${pc.bold('SUMMARY')}  ${parts.join('   ')}`
 }

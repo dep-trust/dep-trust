@@ -67,8 +67,8 @@ function parseArgs(argv: string[]): CliArgs {
         break
       case '--fail-on': {
         const val = args[++i]
-        if (val === 'freshness' || val === 'scripts' || val === 'diff' || val === 'all') {
-          parsed.failOn = val
+        if (val === 'freshness' || val === 'scripts' || val === 'diff' || val === 'maintainers' || val === 'all') {
+          parsed.failOn = val as import('@dep-trust/types/scan').FailOn
         }
         break
       }
