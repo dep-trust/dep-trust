@@ -20,6 +20,7 @@ export async function checkFreshness(
           publishedAt: null,
           ageHours: null,
           flagged: false,
+          maintainers: info.maintainers,
           error: info.error,
         } satisfies FreshnessResult
       }
@@ -33,6 +34,7 @@ export async function checkFreshness(
         publishedAt: info.publishedAt,
         ageHours,
         flagged: ageHours < maxAgeHours,
+        maintainers: info.maintainers,
         error: null,
       } satisfies FreshnessResult
     },

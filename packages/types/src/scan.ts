@@ -5,7 +5,7 @@ export interface ScanOptions {
   cwd: string
 }
 
-export type FailOn = 'freshness' | 'scripts' | 'diff' | 'maintainers' | 'all'
+export type FailOn = 'freshness' | 'scripts' | 'diff' | 'maintainers' | 'typosquat' | 'all'
 
 export interface PackageMeta {
   name: string
@@ -18,6 +18,7 @@ export interface FreshnessResult {
   publishedAt: Date | null
   ageHours: number | null
   flagged: boolean
+  maintainers: string[]
   error: string | null
 }
 
@@ -53,10 +54,18 @@ export interface SnapshotDiff {
   snapshotDate: string | null
 }
 
+export interface TyposquatResult {
+  name: string
+  similarTo: string
+  distance: number
+  confidence: 'high' | 'medium'
+}
+
 export interface ScanResult {
   freshness: FreshnessResult[]
   scripts: ScriptResult[]
   diff: SnapshotDiff | null
+  typosquats: TyposquatResult[]
   timestamp: string
   packageCount: number
   severity?: 'clean' | 'warning' | 'critical'
@@ -76,6 +85,7 @@ export interface ScanFindings {
   freshness: FreshnessResult[]
   scripts: ScriptResult[]
   diff: SnapshotDiff | null
+  typosquats: TyposquatResult[]
 }
 
 export interface ScanRecord {

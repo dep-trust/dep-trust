@@ -41,6 +41,16 @@ export function formatScanResult(result: ScanResult): string {
     lines.push('')
   }
 
+  if (result.typosquats.length > 0) {
+    lines.push(pc.bold('TYPOSQUAT WARNINGS'))
+    for (const sq of result.typosquats) {
+      const color = sq.confidence === 'high' ? pc.red : pc.yellow
+      const icon = sq.confidence === 'high' ? '✗' : '?'
+      lines.push(`  ${color(icon)}  ${color(sq.name.padEnd(20))} looks like ${sq.similarTo} (distance: ${sq.distance})`)
+    }
+    lines.push('')
+  }
+
   lines.push(formatSummary(result))
   lines.push(pc.dim('run dep-trust scan --json for machine-readable output'))
   lines.push('')
@@ -121,6 +131,7 @@ function formatSummary(result: ScanResult): string {
   else parts.push(pc.green('0 lockfile changes'))
 
   if (maintainerChanges > 0) parts.push(pc.red(`${maintainerChanges} maintainer change${maintainerChanges > 1 ? 's' : ''}`))
+  if (result.typosquats.length > 0) parts.push(pc.red(`${result.typosquats.length} typosquat warning${result.typosquats.length > 1 ? 's' : ''}`))
 
   return `${pc.bold('SUMMARY')}  ${parts.join('   ')}`
 }

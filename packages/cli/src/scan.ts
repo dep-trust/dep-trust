@@ -2,7 +2,11 @@ import { checkFreshness } from './freshness'
 import { parseLockfile } from './lockfile'
 import { detectScripts } from './scripts'
 import { diffSnapshot, saveSeen } from './snapshot'
+import { detectTyposquats } from './typosquat'
+import topPackagesJson from './data/top-packages.json'
 import type { ScanOptions, ScanResult } from '@dep-trust/types/scan'
+
+const TOP_PACKAGES = new Set(topPackagesJson as string[])
 
 const DEFAULT_OPTIONS: ScanOptions = {
   age: 72,
@@ -32,6 +36,7 @@ export async function scan(
   }
 
   const diff = diffSnapshot(opts.cwd, currentMaintainers)
+  const typosquats = detectTyposquats(packages.map(p => p.name), TOP_PACKAGES)
 
   if (opts.scripts) {
     const scriptNames = scripts.map((s) => s.name)
@@ -44,14 +49,16 @@ export async function scan(
   const hasScripts = scripts.some((s) => s.status === 'new')
   const hasDiff = (diff?.added.length ?? 0) > 0 || (diff?.removed.length ?? 0) > 0 || (diff?.bumped.length ?? 0) > 0
   const hasMaintainerChanges = (diff?.maintainerChanges.length ?? 0) > 0
+  const hasTyposquats = typosquats.length > 0
 
   if (hasFreshness) failedChecks.push('freshness')
   if (hasScripts) failedChecks.push('scripts')
   if (hasDiff) failedChecks.push('diff')
   if (hasMaintainerChanges) failedChecks.push('maintainers')
+  if (hasTyposquats) failedChecks.push('typosquat')
 
   let severity: 'clean' | 'warning' | 'critical' = 'clean'
-  if (hasScripts || hasFreshness || hasMaintainerChanges) {
+  if (hasScripts || hasFreshness || hasMaintainerChanges || hasTyposquats) {
     severity = 'critical'
   } else if (hasDiff) {
     severity = 'warning'
@@ -64,11 +71,13 @@ export async function scan(
   if (failOn === 'scripts' && hasScripts) pass = false
   if (failOn === 'diff' && hasDiff) pass = false
   if (failOn === 'maintainers' && hasMaintainerChanges) pass = false
+  if (failOn === 'typosquat' && hasTyposquats) pass = false
 
   return {
     freshness,
     scripts,
     diff,
+    typosquats,
     timestamp: new Date().toISOString(),
     packageCount: packages.length,
     severity,
